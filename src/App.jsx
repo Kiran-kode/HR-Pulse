@@ -6,6 +6,8 @@ import Leaves from './pages/adminPages/Leaves';
 import TotalEmployees from './pages/adminPages/TotalEmployees';
 import DailyReports from './pages/adminPages/DailyReports';
 import Tasks from './pages/adminPages/Tasks';
+import LoginPage from './pages/adminPages/LoginPage';
+import SignUp from './components/adminPagesComponents/loginSignup/SignUp';
 
 const App = () => {
   return (
@@ -20,6 +22,8 @@ const App = () => {
         <Route path="reports" element={<DailyReports />} />
         <Route path="tasks" element={<Tasks />} />
       </Route>
+      <Route path="login" element={<LoginPage />} />
+      <Route path="signup" element={<SignUp />} />
     </Routes>
   );
 };
