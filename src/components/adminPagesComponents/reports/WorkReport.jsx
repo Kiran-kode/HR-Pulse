@@ -138,7 +138,7 @@ const WorkReport = () => {
     <div className="w-full">
       {/* Filters */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center grow gap-4 max-w-3xl">
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
           <FilterDepartment 
             departments={departments}

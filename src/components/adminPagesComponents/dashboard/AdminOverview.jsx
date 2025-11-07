@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiUsers, FiUserCheck, FiUserX, FiCalendar, FiClock, FiAlertTriangle } from 'react-icons/fi';
+import CheckinStatus from './CheckinStatus';
 
 const StatCard = ({ icon, title, value, bgColor, iconColor }) => {
     return (
@@ -65,6 +66,7 @@ const AdminOverview = () => {
 
     return (
         <>
+        <CheckinStatus/>
             <h1 className='text-xl font-bold mb-2'>Admin Overview</h1>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 {overviewStats.map((stat, index) => (

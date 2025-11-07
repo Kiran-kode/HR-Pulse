@@ -2,7 +2,7 @@ import React from 'react';
 
 const FilterDepartment = ({ departments, selectedDepartment, onChange }) => {
   return (
-    <div className="relative w-full max-w-xs  cursor-pointer">
+    <div className="relative sm:w-full w-full   cursor-pointer">
       <select
         value={selectedDepartment}
         onChange={(e) => onChange(e.target.value)}

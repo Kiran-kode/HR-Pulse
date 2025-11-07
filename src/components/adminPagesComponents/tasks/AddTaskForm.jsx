@@ -8,8 +8,10 @@ const AddTaskForm = ({ onSubmit, onCancel }) => {
       project: '',
       priority: 'Medium',
       status: 'To Do',
-      dueDate: new Date().toISOString().split('T')[0],
-      dueTime: '09:00',
+      startDate: new Date().toISOString().split('T')[0],
+      startTime: '09:00',
+      endDate: new Date().toISOString().split('T')[0],
+      endTime: '17:00',
       assignedTo: '',
     },
   });
@@ -24,7 +26,7 @@ const AddTaskForm = ({ onSubmit, onCancel }) => {
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
-      <div className="space-y-4">
+      <div className="space-y-4 max-h-[80vh] overflow-y-auto">
         {/* Row 1: Task Title and Project */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -79,30 +81,53 @@ const AddTaskForm = ({ onSubmit, onCancel }) => {
           </div>
         </div>
 
-        {/* Row 3: Due Date and Due Time */}
+        {/* Row 3: Start Date and Start Time */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Due Date *</label>
+            <label className="block text-sm font-medium text-gray-700">Start Date *</label>
             <input
-              {...register('dueDate', { required: 'Due date is required' })}
+              {...register('startDate', { required: 'Start date is required' })}
               type="date"
-              className={`${inputClasses} ${errors.dueDate ? 'border-red-500' : ''}`}
+              className={`${inputClasses} ${errors.startDate ? 'border-red-500' : ''}`}
             />
-            {errors.dueDate && <p className={errorClasses}>{errors.dueDate.message}</p>}
+            {errors.startDate && <p className={errorClasses}>{errors.startDate.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Due Time *</label>
+            <label className="block text-sm font-medium text-gray-700">Start Time *</label>
             <input
-              {...register('dueTime', { required: 'Due time is required' })}
+              {...register('startTime', { required: 'Start time is required' })}
               type="time"
-              className={`${inputClasses} ${errors.dueTime ? 'border-red-500' : ''}`}
+              className={`${inputClasses} ${errors.startTime ? 'border-red-500' : ''}`}
             />
-            {errors.dueTime && <p className={errorClasses}>{errors.dueTime.message}</p>}
+            {errors.startTime && <p className={errorClasses}>{errors.startTime.message}</p>}
           </div>
         </div>
 
-        {/* Row 4: Assigned To */}
+        {/* Row 4: End Date and End Time */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">End Date *</label>
+            <input
+              {...register('endDate', { required: 'End date is required' })}
+              type="date"
+              className={`${inputClasses} ${errors.endDate ? 'border-red-500' : ''}`}
+            />
+            {errors.endDate && <p className={errorClasses}>{errors.endDate.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">End Time *</label>
+            <input
+              {...register('endTime', { required: 'End time is required' })}
+              type="time"
+              className={`${inputClasses} ${errors.endTime ? 'border-red-500' : ''}`}
+            />
+            {errors.endTime && <p className={errorClasses}>{errors.endTime.message}</p>}
+          </div>
+        </div>
+
+        {/* Row 5: Assigned To */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Assigned To *</label>
           <input

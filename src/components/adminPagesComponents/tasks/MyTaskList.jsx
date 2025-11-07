@@ -1,73 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { FiSearch } from 'react-icons/fi';
-import AddNewTask from './AddNewTask';
 
-
-const MyTaskList = () => {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: 'Task 1',
-      day: 'Today',
-      priority: 'High',
-      status: 'In Progress',
-      dueDate: '2025-11-10',
-      dueTime: '12:15 PM - 4:30 PM',
-      createdAt: 'Nov 1, 2025',
-      assignedTo: 'John Doe',
-    },
-    {
-      id: 2,
-      title: 'Task 2',
-      day: 'Today',
-      priority: 'Medium',
-      status: 'Pending',
-      dueDate: '2025-11-15',
-      dueTime: '12:15 PM - 4:30 PM',
-      createdAt: 'Sep 8, 2024',
-      assignedTo: 'Kiran',
-    },
-    {
-      id: 3,
-      title: 'Task 3',
-      day: 'Tomorrow',
-      priority: 'Low',
-      status: 'Completed',
-      dueDate: '2025-11-16',
-      dueTime: '10:00 AM - 2:00 PM',
-      createdAt: 'Nov 2, 2025',
-      assignedTo: 'Jane Smith',
-    },
-    {
-      id: 4,
-      title: 'Task 4',
-      day: 'Today',
-      priority: 'High',
-      status: 'Pending',
-      dueDate: '2025-11-20',
-      dueTime: '2:00 PM - 5:00 PM',
-      createdAt: 'Nov 3, 2025',
-      assignedTo: 'Peter Jones',
-    },
-    {
-      id: 5,
-      title: 'Task 5',
-      day: 'Next Week',
-      priority: 'Medium',
-      status: 'Completed',
-      dueDate: '2025-11-25',
-      dueTime: '9:00 AM - 12:00 PM',
-      createdAt: 'Nov 4, 2025',
-      assignedTo: 'Sam Wilson',
-    },
-  ]);
-
+const MyTaskList = ({ allTasks }) => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+const today = new Date().toISOString().split('T')[0];
+
 
   const getPriorityLabelStyles = (priority) => {
     const priorityLower = priority?.toLowerCase();
-
     return priorityLower === 'high'
       ? 'bg-red-500 text-white'
       : priorityLower === 'medium'
@@ -79,7 +20,6 @@ const MyTaskList = () => {
 
   const getStatusStyles = (status) => {
     const statusLower = status?.toLowerCase();
-
     return statusLower === 'pending'
       ? 'text-black'
       : statusLower === 'in progress'
@@ -91,7 +31,6 @@ const MyTaskList = () => {
 
   const getBorderColor = (priority) => {
     const priorityLower = priority?.toLowerCase();
-
     return priorityLower === 'high'
       ? 'border-l-4 border-red-500'
       : priorityLower === 'medium'
@@ -100,8 +39,37 @@ const MyTaskList = () => {
           ? 'border-l-4 border-green-500'
           : 'border-l-4 border-gray-500';
   };
+
+  // Format time from 24-hour to 12-hour format
+  const formatTime = (time24) => {
+    if (!time24) return '';
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
+
   const filteredTasks = useMemo(() => {
-    let filtered = tasks;
+    let filtered = allTasks || [];
+
+     switch (activeFilter) {
+      case 'upcoming':
+        // Show tasks where the start date is in the future
+        filtered = filtered.filter(task => task.startDate > today);
+        break;
+      case 'pending':
+        filtered = filtered.filter(task => task.status.toLowerCase() === 'pending');
+        break;
+      case 'completed':
+        filtered = filtered.filter(task => task.status.toLowerCase() === 'completed');
+        break;
+      case 'all':
+      default:
+        // 'all' now means all tasks EXCEPT today's
+        filtered = filtered.filter(task => task.startDate !== today);
+        break;
+     }
 
     // Apply status filter
     if (activeFilter === 'pending') {
@@ -119,11 +87,7 @@ const MyTaskList = () => {
     }
 
     return filtered;
-  }, [activeFilter, searchQuery, tasks]);
-
-  const handleAddTask = (newTask) => {
-    setTasks([...tasks, newTask]);
-  }
+  }, [activeFilter, searchQuery, allTasks]);
 
   return (
     <div className="w-full">
@@ -177,7 +141,6 @@ const MyTaskList = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-           
           </div>
         </div>
 
@@ -218,11 +181,15 @@ const MyTaskList = () => {
                   <p className="text-gray-500 font-semibold text-sm">{task.day}</p>
                 </div>
 
-                {/* Due Date and Time */}
-                <div>
-                  <div className="flex flex-col sm:flex-row gap-2 font-semibold text-xs sm:text-sm">
-                    <p className="text-black">{task.dueDate}</p>
-                    <p className="text-black">{task.dueTime}</p>
+                {/* Start & End Date/Time */}
+                <div className="space-y-2 text-sm">
+                  <div>
+                    <h3 className="text-xs text-gray-500">Start</h3>
+                    <p className="font-semibold text-black">{task.startDate} | {formatTime(task.startTime)}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs text-gray-500">End</h3>
+                    <p className="font-semibold text-black">{task.endDate} | {formatTime(task.endTime)}</p>
                   </div>
                 </div>
 

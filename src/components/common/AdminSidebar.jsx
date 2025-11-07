@@ -1,6 +1,8 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { FiGrid, FiUsers, FiCalendar, FiFileText, FiX } from "react-icons/fi";
+import { FaTasks } from "react-icons/fa";
+import { CgProfile } from "react-icons/cg";
 
 const AdminSidebar = ({ isCollapsed, isMobileOpen, closeMobileSidebar }) => {
   const linkClasses =
@@ -12,7 +14,8 @@ const AdminSidebar = ({ isCollapsed, isMobileOpen, closeMobileSidebar }) => {
     { to: "/employees", icon: <FiUsers />, label: "Employees" },
     { to: "/leaves", icon: <FiCalendar />, label: "Leaves" },
     { to: "/reports", icon: <FiFileText />, label: "Reports" },
-    { to: "/tasks", icon: <FiFileText />, label: "Tasks" },
+    { to: "/tasks", icon: <FaTasks />, label: "Tasks" },
+    { to: "/profile", icon: <CgProfile  />, label: "Profile" },
   ];
 
   return (  

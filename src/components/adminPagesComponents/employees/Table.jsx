@@ -138,8 +138,8 @@ const Table = () => {
 
   return (
     <div className="w-full">
-      <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-4 items-center w-full sm:w-auto">
+      <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between grow">
+        <div className="flex flex-col sm:flex-row sm:items-center w-full max-w-3xl grow gap-4">
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
           <FilterDepartment
             departments={departments}
@@ -147,8 +147,8 @@ const Table = () => {
             onChange={setSelectedDepartment}
           />
         </div>
-        <button className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
-          <FiPlus size={16} onClick={() => setIsAddModalOpen(true)}
+        <button onClick={() => setIsAddModalOpen(true)} className="flex cursor-pointer items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
+          <FiPlus size={16} 
 />
           Add Employee
         </button>

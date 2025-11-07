@@ -89,7 +89,7 @@ const AllLeaves = () => {
         setLeaves(leaves.map(leave =>
             leave.id === leaveId ? { ...leave, status: newStatus } : leave
         ));
-        // In a real app, you would make an API call here.
+        // In a real app, would make an API call here.
     };
 
     const leavesColumns = [
@@ -129,8 +129,8 @@ const AllLeaves = () => {
 
     return (
         <div className="w-full">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center grow sm:justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center grow gap-4">
                     <SearchBar value={searchQuery} onChange={setSearchQuery} />
                     <FilterDepartment
                         departments={departments}
