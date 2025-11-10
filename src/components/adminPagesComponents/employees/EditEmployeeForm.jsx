@@ -1,5 +1,7 @@
 import React from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { updateEmployee } from '../../../service';
 
 const EditEmployeeForm = ({ employee, onSave, onCancel }) => {
   const { register, handleSubmit, formState: { errors }, watch } = useForm({
@@ -17,29 +19,28 @@ const EditEmployeeForm = ({ employee, onSave, onCancel }) => {
     },
   });
 
+    const [loading, setLoading] = useState(false);
   // Watch the new password field for confirmation validation
   const newPassword = watch('password');
 
-  const onSubmit = (data) => {
-    const updatedEmployee = { ...employee, ...data };
-
-    // Handle image update: if a new image is selected, create a URL for it
-    if (data.image && data.image[0]) {
-      updatedEmployee.imageUrl = URL.createObjectURL(data.image[0]);
+  const onSubmit = async(data) => {
+    try {
+      setLoading(true);
+      const { confirmPassword, password, ...employeeData } = data;
+      console.log("employee id", employee._id);
+      console.log(employeeData);
+      
+      if (password) {
+        employeeData.password = password;
+      } 
+      const response = await updateEmployee(employee._id, employeeData);
+      alert('Employee updated successfully');
+      if(onSave) onSave(response.data);
+    } catch (error) {
+      console.error('Error updating employee:', error.message);
+    } finally {
+      setLoading(false);
     }
-    
-    // In a real app, you would handle password hashing on the backend.
-    // We only proceed if a new password is provided.
-    if (data.password) {
-      console.log("Password change requested for employee:", employee.id);
-    }
-
-    // Clean up form-specific fields before saving
-    delete updatedEmployee.password;
-    delete updatedEmployee.confirmPassword;
-    delete updatedEmployee.image;
-
-    onSave(updatedEmployee);
   };
 
   const inputClasses = "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 text-sm";

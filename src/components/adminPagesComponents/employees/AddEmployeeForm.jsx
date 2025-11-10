@@ -1,6 +1,7 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-
+import axiosInstance from '../../../api.js'
 const AddEmployeeForm = ({ onSave, onCancel }) => {
   const { register, handleSubmit, formState: { errors }, watch } = useForm({
     defaultValues: {
@@ -15,13 +16,47 @@ const AddEmployeeForm = ({ onSave, onCancel }) => {
       image: null,
     },
   });
+  // useEffect(async () => {
+  //   try {
+  //    let response =  await axiosInstance.post('/employees/add', {
+  //      name: watch('name'),
+  //       email: watch('email'),
+  //       phone: watch('phone'),
+  //       department: watch('department'),
+  //       designation: watch('designation'),
+  //       status: watch('status'),
+  //       password: watch('password'),
+  //       image: watch('image'),
+  //     });
+  //     console.log(response.data);
+      
+  //   } catch (error) {
+  //     console.error('Error adding employee:', error.message);
+  //   }
+  // }, [watch]);
 
-  // Watch the password field to use for validation in the confirm password field
   const passwordValue = watch('password');
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const employeeId = `EMP${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
     
+try {
+     let response =  await axiosInstance.post('/employees/add', {
+       name: watch('name'),
+        email: watch('email'),
+        phone: watch('phone'),
+        department: watch('department'),
+        designation: watch('designation'),
+        status: watch('status'),
+        password: watch('password'),
+        image: watch('image'),
+      });
+      console.log(response.data);
+      
+    } catch (error) {
+      console.error('Error adding employee:', error.message);
+    }
+
     // In a real app, you would handle file upload to a server here.
     // For now, we'll create a local URL if a file is selected.
     const imageUrl = data.image && data.image[0] 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import {
   BarChart,
   Bar,
@@ -9,27 +9,29 @@ import {
   ResponsiveContainer,
   Rectangle,
 } from "recharts";
+import { getAttendanceTrend } from "../../../service";
 
 const AttendanceChart = () => {
-  const weeklyData = [
-    { day: "Mon", present: 25, absent: 5 },
-    { day: "Tue", present: 27, absent: 3 },
-    { day: "Wed", present: 26, absent: 4 },
-    { day: "Thu", present: 28, absent: 2 },
-    { day: "Fri", present: 24, absent: 6 },
-    { day: "Sat", present: 29, absent: 1 },
-    { day: "Sun", present: 26, absent: 4 },
-  ];
-
-  const monthlyData = [
-    { week: "Week 1", present: 150, absent: 20 },
-    { week: "Week 2", present: 160, absent: 15 },
-    { week: "Week 3", present: 155, absent: 18 },
-    { week: "Week 4", present: 165, absent: 10 },
-  ];
-
   const [selectedRange, setSelectedRange] = useState("7days");
-  const chartData = selectedRange === "7days" ? weeklyData : monthlyData;
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await getAttendanceTrend(selectedRange);
+        console.log(response.data);
+        
+        setChartData(response.data);
+      } catch (error) {
+        console.error('Error fetching attendance trend:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [selectedRange]);
 
   return (
     <div className="p-6   rounded-2xl shadow-lg w-full border border-indigo-100">

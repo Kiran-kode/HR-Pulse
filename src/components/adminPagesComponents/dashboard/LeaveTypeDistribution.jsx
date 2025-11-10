@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ResponsiveContainer,
   PieChart,
@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-
+import { getLeaveDistribution } from "../../../service";
 const COLORS = {
   Sick: "#06b6d4",    // cyan-500
   Annual: "#10b981",  // green-500
@@ -17,7 +17,6 @@ const COLORS = {
 };
 
 const renderActiveShape = (props) => {
-  // Render the same sector (no visual change on active/hover)
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
   return (
     <g>
@@ -35,18 +34,34 @@ const renderActiveShape = (props) => {
 };
 
 const LeaveTypeDistribution = ({data=null}) => {
-  const sample = [
-    { name: "Sick", value: 3 },
-    { name: "Annual", value: 6 },
-    { name: "Casual", value: 2 },
-    { name: "Unpaid", value: 1 },
-  ];
-
-  const chartData = data ?? sample;
-  const total = chartData.reduce((s, item) => s + item.value, 0);
-
-  // keep activeIndex controlled but render identically (prevents default enlargement)
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(-1);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await getLeaveDistribution();
+        console.log(response.data);
+        
+        // Map the data to match the chart format
+        const mappedData = response.data.map(item => ({
+          name: item.leaveType,
+          value: item.count,
+        }));
+        
+        setChartData(mappedData);
+      } catch (error) {
+        console.error('Error fetching leave distribution:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+     fetchData();
+  }, []);
+  const total = chartData.reduce((sum, item) => sum + item.value, 0);
+
   return (
   <div className="w-full p-5 rounded-2xl   shadow-md border border-slate-100">
       <div className="flex items-center justify-between mb-4">
@@ -84,9 +99,9 @@ const LeaveTypeDistribution = ({data=null}) => {
               cy="50%"
               innerRadius={70}
               outerRadius={100}
-              paddingAngle={4}            // controlled active index
-              activeShape={renderActiveShape}      // renders same shape (no highlight)
-              onMouseEnter={() => setActiveIndex(-1)} // ensure no active highlight on hover
+              paddingAngle={4}
+              activeShape={renderActiveShape}
+              onMouseEnter={() => setActiveIndex(-1)}
               onMouseLeave={() => setActiveIndex(-1)}
               isAnimationActive={true}
               animationDuration={700}

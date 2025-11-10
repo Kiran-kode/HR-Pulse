@@ -1,7 +1,8 @@
 import React from 'react';
 import { FiUsers, FiUserCheck, FiUserX, FiCalendar, FiClock, FiAlertTriangle } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
 import CheckinStatus from './CheckinStatus';
-
+import {getDashboardOverview} from '../../../service'
 const StatCard = ({ icon, title, value, bgColor, iconColor }) => {
     return (
         <div className="rounded-lg bg-white p-4 shadow-md">
@@ -19,51 +20,79 @@ const StatCard = ({ icon, title, value, bgColor, iconColor }) => {
 };
 
 const AdminOverview = () => {
+     const [stats, setStats] = useState({
+        totalEmployees: 0,
+        presentToday: 0,
+        absentToday: 0,
+        onLeaveToday: 0,
+        halfDayToday: 0,
+        lateArrivalsToday: 0,
+    })
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchOverview = async () => {
+            try {
+                setLoading(true);
+                const response = await getDashboardOverview();
+                setStats(response.data);
+            } catch (error) {
+                console.error('Error fetching dashboard overview:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOverview();
+    }, []);
     const overviewStats = [
         {
             title: 'Total Employees',
-            value: 150,
+            value: stats.totalEmployees,
             icon: <FiUsers />,
             bgColor: 'bg-blue-100',
             iconColor: 'text-blue-600',
         },
         {
             title: 'Present Today',
-            value: 135,
+            value: stats.presentToday,
             icon: <FiUserCheck />,
             bgColor: 'bg-green-100',
             iconColor: 'text-green-600',
         },
         {
             title: 'Absent Today',
-            value: 5,
+            value: stats.absentToday,
             icon: <FiUserX />,
             bgColor: 'bg-red-100',
             iconColor: 'text-red-600',
         },
         {
             title: 'On Leave',
-            value: 10,
+            value: stats.onLeaveToday,
             icon: <FiCalendar />,
             bgColor: 'bg-yellow-100',
             iconColor: 'text-yellow-600',
         },
         {
             title: 'Half Day',
-            value: 3,
+            value: stats.halfDayToday,
             icon: <FiClock />,
             bgColor: 'bg-purple-100',
             iconColor: 'text-purple-600',
         },
         {
             title: 'Late Arrivals',
-            value: 7,
+            value: stats.lateArrivalsToday,
             icon: <FiAlertTriangle />,
             bgColor: 'bg-orange-100',
             iconColor: 'text-orange-600',
         },
     ];
-
+ if (loading) {
+        return <div className="text-center py-10">Loading overview...</div>;
+    }
+    console.log("stats are", stats);
+    
     return (
         <>
         <CheckinStatus/>

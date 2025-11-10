@@ -4,67 +4,48 @@ import FilterStatus from './FilterStatus'
 import SearchBar from '../employees/SearchBar'
 import FilterDepartment from '../employees/FilterDepartment'
 import TableLayout from '../employees/TableLayout'
+import { getAllLeaves, updateLeaveStatus } from '../../../service'
 
 
 const AllLeaves = () => {
-    const initialLeaves = [
-        {
-            id: 1,
-            employeeName: 'John Doe',
-            department: 'Development',
-            leaveType: 'Sick Leave',
-            startDate: '2-11-2025',
-            endDate: '11-11-2025',
-            reason: 'Fever and headache',
-            status: 'Pending'
-        },
-        {
-            id: 2,
-            employeeName: 'Jane Smith',
-            department: 'Design',
-            leaveType: 'Vacation',
-            startDate: '20-12-2025',
-            endDate: '28-12-2025',
-            reason: 'Family trip',
-            status: 'Approved'
-        },
-        {
-            id: 3,
-            employeeName: 'Peter Jones',
-            department: 'Management',
-            leaveType: 'Personal',
-            startDate: '5-11-2025',
-            endDate: '5-11-2025',
-            reason: 'Bank appointment',
-            status: 'Approved'
-        },
-        {
-            id: 4,
-            employeeName: 'Sam Wilson',
-            department: 'Development',
-            leaveType: 'Sick Leave',
-            startDate: '2-11-2025',
-            endDate: '3-11-2025',
-            reason: 'Stomach flu',
-            status: 'Rejected'
-        },
-        {
-            id: 5,
-            employeeName: 'Maria Garcia',
-            department: 'Design',
-            leaveType: 'Vacation',
-            startDate: '15-11-2025',
-            endDate: '20-11-2025',
-            reason: 'Holiday travel',
-            status: 'Pending'
-        },
-    ];
-
-    const [leaves, setLeaves] = useState(initialLeaves);
-    const [filteredLeaves, setFilteredLeaves] = useState(initialLeaves);
+   
+    const [leaves, setLeaves] = useState([]);
+    const [filteredLeaves, setFilteredLeaves] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedDepartment, setSelectedDepartment] = useState('');
+    const [loading, setLoading] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState('');
+ useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const response = await getAllLeaves();
+                console.log('Leaves Response:', response.data);
+                
+                // Map the response data to match your columns
+                const mappedLeaves = response.data.map(leave => ({
+                    _id: leave._id,
+                    employeeName: leave.employeeId?.name || 'N/A',
+                    department: leave.employeeId?.department || 'N/A',
+                    leaveType: leave.leaveType,
+                    startDate: new Date(leave.startDate).toLocaleDateString('en-GB'),
+                    endDate: new Date(leave.endDate).toLocaleDateString('en-GB'),
+                    reason: leave.reason,
+                    status: leave.status,
+                    employeeId: leave.employeeId?._id,
+                }));
+
+                setLeaves(mappedLeaves);
+                setFilteredLeaves(mappedLeaves);
+            } catch (error) {
+                console.error('Error fetching leaves:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+console.log(leaves);
 
     const departments = [...new Set(leaves.map(leave => leave.department))];
     const statuses = ['Pending', 'Approved', 'Rejected'];
@@ -75,7 +56,7 @@ const AllLeaves = () => {
         );
 
         if (selectedDepartment) {
-            filtered = filtered.filter(leave => leave.department === selectedDepartment);
+            filtered = filtered.filter(leave => leave.employeeId.department === selectedDepartment);
         }
 
         if (selectedStatus) {
@@ -85,12 +66,26 @@ const AllLeaves = () => {
         setFilteredLeaves(filtered);
     }, [searchQuery, selectedDepartment, selectedStatus, leaves]);
 
-    const handleStatusChange = (leaveId, newStatus) => {
-        setLeaves(leaves.map(leave =>
-            leave.id === leaveId ? { ...leave, status: newStatus } : leave
-        ));
-        // In a real app, would make an API call here.
+     const handleStatusChange = async (id, newStatus) => {
+        try {
+            console.log(id);
+            
+            await updateLeaveStatus(id, { 
+                status: newStatus,
+            });
+
+            // Update local state
+            setLeaves(leaves.map(leave =>
+                leave._id === id ? { ...leave, status: newStatus } : leave
+            ));
+
+            alert(`Leave request ${newStatus.toLowerCase()} successfully`);
+        } catch (error) {
+            console.error('Error updating leave status:', error);
+            alert('Failed to update leave status');
+        }
     };
+
 
     const leavesColumns = [
         { header: 'Employee Name', accessor: 'employeeName' },
@@ -115,10 +110,10 @@ const AllLeaves = () => {
             render: (row) => (
                 (row.status === 'Pending' || row.status === 'Rejected' || row.status === 'Approved') && (
                     <div className="flex items-center space-x-3">
-                        <button onClick={() => handleStatusChange(row.id, 'Approved')} className="text-green-600 hover:text-green-800" title="Approve">
+                        <button onClick={() => handleStatusChange(row._id, 'Approved')} className="text-green-600 hover:text-green-800" title="Approve">
                             <span className='py-1 border border-blue-600 text-white px-3 bg-blue-600 hover:bg-blue-500 rounded font-semibold cursor-pointer'>Accept</span>
                         </button>
-                        <button onClick={() => handleStatusChange(row.id, 'Rejected')} className="text-red-600 hover:text-red-800" title="Reject">
+                        <button onClick={() => handleStatusChange(row._id, 'Rejected')} className="text-red-600 hover:text-red-800" title="Reject">
                             <span className='py-1 border border-red-700 text-red-700 px-3 hover:bg-red-50 font-semibold cursor-pointer'>Reject</span>
                         </button>
                     </div>

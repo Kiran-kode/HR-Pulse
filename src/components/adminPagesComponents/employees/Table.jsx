@@ -6,50 +6,33 @@ import EditEmployeeForm from './EditEmployeeForm';
 import { FiEdit, FiTrash2, FiPlus } from 'react-icons/fi';
 import SearchBar from './SearchBar';
 import FilterDepartment from './FilterDepartment';
-
+import { deleteEmployee, getAllEmployees } from '../../../service';
 const Table = () => {
-  const initialUsers = [
-    {
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      designation: 'Software Engineer',
-      department: 'Development',
-      id: 'EMP001',
-      phone: '123-456-7890',
-      status: 'Active',
-      imageUrl: 'https://via.placeholder.com/40',
-    },
-    {
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      designation: 'UI/UX Designer',
-      department: 'Design',
-      id: 'EMP002',
-      phone: '987-654-3210',
-      status: 'On Leave',
-      imageUrl: 'https://via.placeholder.com/40',
-    },
-    {
-      name: 'Peter Jones',
-      email: 'peter.jones@example.com',
-      designation: 'Project Manager',
-      department: 'Management',
-      id: 'EMP003',
-      phone: '555-555-5555',
-      status: 'Active',
-      imageUrl: 'https://via.placeholder.com/40',
-    },
-  ];
 
-  const [users, setUsers] = useState(initialUsers);
-  const [filteredUsers, setFilteredUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState('');
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const departments = [...new Set(users.map(user => user.department))];
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await getAllEmployees();
+      console.log(response);
+      
+      setUsers(response.employees);
+      setFilteredUsers(response.employees);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  fetchData();
+}, []); 
 
   useEffect(() => {
     const lowercasedQuery = searchQuery.toLowerCase();
@@ -71,17 +54,19 @@ const Table = () => {
     setSelectedEmployee(employee);
     setIsModalOpen(true);
   };
-
-  const handleDelete = (employeeId) => {
+  
+  const handleDelete = async (employeeId) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
-      setUsers(users.filter(user => user.id !== employeeId));
+      console.log(employeeId);
+      const response = await deleteEmployee(employeeId);
+      setUsers(users.filter(user => user._id !== employeeId));
       console.log(`Deleted employee with ID: ${employeeId}`);
     }
   };
 
   const handleSave = (updatedEmployee) => {
     console.log('Saving employee:', updatedEmployee);
-    setUsers(users.map(user => user.id === updatedEmployee.id ? updatedEmployee : user));
+    setUsers(users.map(user => user._id === updatedEmployee._id ? updatedEmployee : user));
     setIsModalOpen(false);
   };
   const handleAddEmployee = (newEmployee) => {
@@ -128,7 +113,7 @@ const Table = () => {
           <button onClick={() => handleEdit(row)} className="text-blue-600 hover:text-blue-800">
             <FiEdit size={18} />
           </button>
-          <button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-800">
+          <button onClick={() => handleDelete(row._id)} className="text-red-600 hover:text-red-800">
             <FiTrash2 size={18} />
           </button>
         </div>
